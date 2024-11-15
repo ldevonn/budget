@@ -1,3 +1,6 @@
+"use client"
+
+
 const { useState } = require("react");
 
 function SignupModal({isOpen, onClose}) {

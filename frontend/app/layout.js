@@ -1,13 +1,17 @@
+"use client"
 import Navigation from "./components/navigation/navigation";
 import "./globals.css";
+import { AuthProvider } from "./contexts/AuthContext";
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
-        <Navigation />
-        {children}
-      </body>
+      <AuthProvider>
+        <body>
+          <Navigation />
+          {children}
+        </body>
+      </AuthProvider>
     </html>
   );
 }
