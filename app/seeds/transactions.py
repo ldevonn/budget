@@ -4,7 +4,7 @@ from sqlalchemy.sql import text
 
 def seed_transactions():
     demo = Transaction(
-        amount=3.99, description='McDonalds')
+        amount=3.99, description='McDonalds', userId='1')
 
     db.session.add(demo)
     db.session.commit()

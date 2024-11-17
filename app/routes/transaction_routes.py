@@ -1,35 +1,36 @@
-from flask import Blueprint, request, jsonify
-from db import db
-from app.models.transactions import Transaction
+from flask import Blueprint, request, session, jsonify
+from app.models import Transaction, db
 
-transaction_bp = Blueprint('transaction_bp', __name__)
 
-@transaction_bp.route('/', methods=['POST'])
-def add_transaction():
-    data = request.get_json()
-    amount = data.get('amount')
-    description = data.get('description')
+transaction_routes = Blueprint('transactions', __name__)
 
-    if not amount or not description:
-        return jsonify({'error': 'Amount and description are required'}), 400
 
-    new_transaction = Transaction(amount=amount, description=description)
-    db.session.add(new_transaction)
-    db.session.commit()
+@transaction_routes.route('/new', methods=['POST'])
+def create_transaction():
+    try:
+        data = request.get_json()
+        print("Received data:", data)
+        
+        # Validate required fields
+        required_fields = ['amount', 'description', 'userId']
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return jsonify({
+                "error": "Missing required fields",
+                "missing_fields": missing_fields
+            }), 400
 
-    return jsonify({'message': 'Transaction added successfully', 'transaction': {'amount': amount, 'description': description}}), 201
-
-@transaction_bp.route('/', methods=['GET'])
-def get_transactions():
-    transactions = Transaction.query.all()
-    result = [{'id': txn.id, 'amount': txn.amount, 'description': txn.description} for txn in transactions]
-    return jsonify(result)
-
-@transaction_bp.route('/<int:id>', methods=['GET'])
-def get_transaction(id):
-    txn = Transaction.query.get_or_404(id)
-    return jsonify({'id': txn.id, 'amount': txn.amount, 'description': txn.description})
-
-# Register the blueprint in a separate function to avoid circular imports
-def register_routes(app):
-    app.register_blueprint(transaction_bp, url_prefix='/transactions')
+        transaction = Transaction(
+            amount=data['amount'],
+            description=data['description'],
+            userId=data['userId']
+        )
+        db.session.add(transaction)
+        db.session.commit()
+        return transaction.to_dict(), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "error": "Failed to create transaction",
+            "details": str(e)
+        }), 500
