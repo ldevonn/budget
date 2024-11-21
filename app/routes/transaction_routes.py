@@ -4,33 +4,20 @@ from app.models import Transaction, db
 
 transaction_routes = Blueprint('transactions', __name__)
 
+@transaction_routes.route('/<userId>')
+def get_transactions(userId):
+    transactions = Transaction.query.filter(Transaction.userId == userId).all()
+    return {'transactions': [transaction.to_dict() for transaction in transactions]}
+
 
 @transaction_routes.route('/new', methods=['POST'])
 def create_transaction():
-    try:
-        data = request.get_json()
-        print("Received data:", data)
-        
-        # Validate required fields
-        required_fields = ['amount', 'description', 'userId']
-        missing_fields = [field for field in required_fields if field not in data]
-        if missing_fields:
-            return jsonify({
-                "error": "Missing required fields",
-                "missing_fields": missing_fields
-            }), 400
-
-        transaction = Transaction(
-            amount=data['amount'],
-            description=data['description'],
-            userId=data['userId']
-        )
-        db.session.add(transaction)
-        db.session.commit()
-        return transaction.to_dict(), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            "error": "Failed to create transaction",
-            "details": str(e)
-        }), 500
+    data = request.get_json()
+    transaction = Transaction(
+        amount=data['amount'],
+        description=data['description'],
+        userId=data['userId']
+    )
+    db.session.add(transaction)
+    db.session.commit()
+    return transaction.to_dict(), 201

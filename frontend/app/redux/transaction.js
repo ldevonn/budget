@@ -1,60 +1,46 @@
 const GET_TRANSACTIONS = "GET_TRANSACTIONS";
 const ADD_TRANSACTION = "ADD_TRANSACTION";
 
-
-const getTransactions = (transaction) => ({
-    type: GET_TRANSACTIONS,
-     payload: transaction
-})
 const addTransaction = (transaction) => ({
     type: ADD_TRANSACTION,
     payload: transaction
 })
 
-// export const getUserTransactions = (userId) => async (dispatch) => {
-//     try {
-//         const response = await fetch(`/api/transactions/${userId}`)
-//         if (response.ok) {
-//             const transactions = await response.json();
-//             dispatch(getTransactions(transactions));
-//             return transactions;
-//         } else {
-//             const errorData = await response.json();
-//             console.error('Get transactions failed:', {
-//                 status: response.status,
-//                 statusText: response.statusText,
-//                 error: errorData
-//             });
-//             throw new Error(`Failed to get transactions: ${response.status} ${response.statusText}`);
-//         }
-//     } catch (error) {
-//         console.error('Get transactions error:', error);
-//         throw error;
-//     }
-// }
+const getTransactions = (userId) => ({
+     type: GET_TRANSACTIONS,
+     payload: userId
+})
+
+export const getUserTransactions = (userId) => async (dispatch) => {
+    try {
+        const response = await fetch(`/api/transactions/${userId}`)
+        let responseData;
+        responseData = await response.json();
+
+        dispatch(getTransactions(responseData));
+        return responseData
+    } catch (error) {
+        console.error('Get transactions error:', error);
+        throw error
+    }
+}
 
 export const addUserTransaction = (formData) => async (dispatch) => {
     try {
-        console.log('Sending transaction data:', formData);
-        const response = await fetch(`/transactions/new`, {
+        const response = await fetch(`/api/transactions/new`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
             body: JSON.stringify(formData),
         });
-        
-        if (response.ok) {
-            const transaction = await response.json();
-            dispatch(addTransaction(transaction));
-            return transaction;
-        } else {
-            const errorData = await response.json();
-            console.error('Add transaction failed:', {
-                status: response.status,
-                statusText: response.statusText,
-                error: errorData
-            });
-            throw new Error(`Failed to add transaction: ${response.status} ${response.statusText}`);
-        }
+
+        let responseData;
+        responseData = await response.json();
+
+        dispatch(addTransaction(responseData));
+        return responseData;
     } catch (error) {
         console.error('Add transaction error:', error);
         throw error;
@@ -72,7 +58,7 @@ function transactionReducer(state = {}, action) {
             return {
                  ...state, 
                 [action.payload.id]: action.payload
-            }
+            };
 
         default:
             return state;

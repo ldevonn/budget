@@ -19,12 +19,15 @@ login.login_view = 'auth.unauthorized'
 app.cli.add_command(seed_commands)
 
 app.config.from_object(Config)
-app.register_blueprint(transaction_routes, url_prefix='/transactions')
+app.register_blueprint(transaction_routes, url_prefix='/api/transactions')
 
 db.init_app(app)
 Migrate(app, db)
 
-CORS(app)
+CORS(app,
+     resources={r"/api/*": {"origins": ["http://localhost:3000", "https://localhost:3000"]}},
+     supports_credentials=True
+     )
 
 @app.before_request
 def https_redirect():

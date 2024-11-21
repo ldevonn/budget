@@ -25,7 +25,6 @@ function TransactionModal({ isOpen, onClose }) {
                 amount: parseFloat(amount),
                 description: description
             };
-            console.log(transactionData)
 
             await dispatch(addUserTransaction(transactionData));
             setAmount('')
