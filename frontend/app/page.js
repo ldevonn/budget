@@ -27,12 +27,13 @@ export default function Home() {
     <>
     {user ? (
       <>
+      <div>
         <p>Hello, Demo! You are logged in</p>
         <button className="bg-red-600"
           onClick={() => setIsTransactionModalOpen(true)}>
             Add Transaction
         </button>
-
+      </div>
         <div>
           <h1>Users transactions:</h1>
           <div className="space-y-4">
