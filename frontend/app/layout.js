@@ -16,7 +16,9 @@ const store = configureStore({
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <script src="https://kit.fontawesome.com/1dc91094e4.js" crossorigin="anonymous"></script>
+      <head>
+        <script src="https://kit.fontawesome.com/1dc91094e4.js" crossOrigin="anonymous"></script>
+      </head>
       <body>
         <Provider store={store}>
           <AuthProvider>
